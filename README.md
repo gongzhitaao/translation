@@ -2,7 +2,7 @@ Translation
 ===========
 
 This repo provides demos on how to use translation API from Microsoft,
-Baidu and Google.
+Baidu and Google with Python3.
 
 ## Microsoft Translation API ##
 
