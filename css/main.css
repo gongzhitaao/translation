@@ -1,0 +1,11 @@
+html, body {
+    font-size: 16px;
+}
+
+#article-list>div {
+    cursor: pointer
+}
+
+.popover{
+    max-width: 80%;
+}
