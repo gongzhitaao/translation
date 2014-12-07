@@ -7,6 +7,7 @@ var Provider = [
   {'name': 'Auburn', 'abbr': 'zh'}
 ];
 var Code = ['ms', 'gl', 'zh'];
+var evil = '';
 
 function UrlParam(url) {
 
@@ -101,70 +102,160 @@ function loadpagei(page)
 
 $(document).ready(function() {
 
+  if (window.location.href.indexOf('evil') > -1)
+    evil = '../';
+
   var param = UrlParam(window.location.search);
 
   if (param && Code.indexOf(param['by']) > -1) {
-    $.getJSON('articles.json', function(data) {
 
-      articles = data.slice();
+    $('.page-header').append(
+      $('<div/>', {'class': 'alert alert-warning', 'role': 'alert'})
+        .append(
+          $('<span/>', {'class': 'glyphicon glyphicon-warning-sign', 'aria-hidden': 'true'}),
+          $('<span/>').text('机器翻译，仅供参考 (Machine translated, for your reference only)')));
 
-      var $list = $('#article-list').html('');
-      $.each(articles, function(i, item) {
-        var $r = $('<small/>').html(item['citation']);
-        var $t = $('<div/>', {'class': 'list-group-item-heading'})
-              .append(
-                $('<h3/>')
-                  .text(item['title'])
-                  .append($('<a/>', {
-                    'href': 'http://dx.doi.org/' + item['doi'],
-                    'style': 'margin-left: 10px'})
-                          .append($('<span/>', {'class': 'glyphicon glyphicon-link'}))),
-                $('<h3/>')
-                  .text(item['title_' + param['by']])
-              );
-        var $p = $('<div/>', {'class': 'list-group-item-text'})
-              .append($('<p/>').text(item['abstract']),
-                      $('<p/>').text(item['abstract_' + param['by']]));
+    $('ul', $('.page-header')).append(
+      $('<li/>').append($('<a/>', {'href': 'http://ieeexplore.ieee.org/xpl/conhome.jsp?punumber=1000355'})
+                        .text('Xplorer 会议主页')),
+      $('<li/>').append($('<a/>', {'href': 'http://ieee-ies.org'})
+                        .text('协会主页')));
 
-        var $d = $('<div/>', {'class': 'list-group-item'})
-              .append($r, $t, $p);
-        $list.append($d);
+    if (evil) {
+
+      $.getJSON(evil + 'articles.json', function(data) {
+
+        articles = data.slice();
+
+        var $list = $('#article-list').html('');
+        $.each(articles, function(i, item) {
+          var $r = $('<p/>').html(item['citation']);
+          var $t = $('<div/>', {'class': 'list-group-item-heading'})
+                .append($('<h3/>').text('标题 (Title): ' + item['title_' + param['by']]));
+
+          var $l = $('<ul/>', {'class': 'list-inline'}).append(
+            $('<li/>').append($('<a/>', {'href': item['url']}).text('Abstract link')),
+            $('<li/>').append($('<a/>', {'href': item['pdf']}).text('Full Text')),
+            $('<li/>').append($('<a/>', {'href': item['url']}).text('摘要')),
+            $('<li/>').append($('<a/>', {'href': item['pdf']}).text('全文'))
+          );
+
+          var $p = $('<div/>', {'class': 'list-group-item-text'})
+                .append($('<p/>').text('摘要 (Abstract): ' + item['abstract_' + param['by']]));
+
+          var $d = $('<div/>', {'class': 'list-group-item'})
+                .append(
+                  $('<table/>')
+                    .append($('<tr/>').append(
+                      $('<td/>', {'style': 'padding-right: 20px'}).text(i),
+                      $('<td/>').append($r, $t, $l, $p))));
+
+          $list.append($d);
+        });
+
       });
 
-    });
+    } else {
+
+      $.getJSON(evil + 'articles.json', function(data) {
+
+        articles = data.slice();
+
+        var $list = $('#article-list').html('');
+        $.each(articles, function(i, item) {
+          var $r = $('<small/>').html(item['citation']);
+          var $t = $('<div/>', {'class': 'list-group-item-heading'})
+                .append(
+                  $('<h3/>')
+                    .text(item['title'])
+                    .append($('<a/>', {
+                      'href': 'http://dx.doi.org/' + item['doi'],
+                      'style': 'margin-left: 10px'})
+                            .append($('<span/>', {'class': 'glyphicon glyphicon-link'}))),
+                  $('<h3/>')
+                    .text(item['title_' + param['by']])
+                );
+          var $p = $('<div/>', {'class': 'list-group-item-text'})
+                .append($('<p/>').text(item['abstract']),
+                        $('<p/>').text(item['abstract_' + param['by']]));
+
+          var $d = $('<div/>', {'class': 'list-group-item'})
+                .append(
+                  $('<table/>')
+                    .append($('<tr/>').append(
+                      $('<td/>', {'style': 'padding-right: 20px'}).text(i),
+                      $('<td/>').append($r, $t, $p))));
+
+          $list.append($d);
+        });
+
+      });
+
+    }
 
   } else {
 
-    $.getJSON('articles.json', function(data) {
+    if (evil) {
 
-      var perpage = 20;
-      var tot = parseInt(Math.ceil(data.length * 1. / perpage));
+      $.getJSON(evil + 'articles.json', function(data) {
 
-      for (var i = 0; i < tot; ++i)
-        articles.push(data.slice(i * perpage, (i+1) * perpage));
+        articles = data.slice();
 
-      var $list = $('#article-list');
+        var $list = $('#article-list').html('');
+        $.each(articles, function(i, item) {
+          var $r = $('<p/>').html(item['citation']);
+          var $l = $('<ul/>', {'class': 'list-inline'}).append(
+            $('<li/>').append($('<a/>', {'href': item['url']}).text('Abstract link')),
+            $('<li/>').append($('<a/>', {'href': item['pdf']}).text('Full Text'))
+          );
+          var $p = $('<div/>', {'class': 'list-group-item-text'})
+                .append($('<p/>').html('<b>Abstract</b>: ' + item['abstract']));
 
-      $('#pagination').twbsPagination({
-        totalPages: tot - 1,
-        onPageClick: function (event, page) {
-          loadpagei(page);
-        }
+          var $d = $('<div/>', {'class': 'list-group-item'})
+                .append(
+                  $('<table/>')
+                    .append($('<tr/>').append(
+                      $('<td/>', {'style': 'padding-right: 20px'}).text(i),
+                      $('<td/>').append($r, $l, $p))));
+          $list.append($d);
+        });
+
       });
 
-      loadpagei(1);
+    } else {
 
-    });
+      $.getJSON(evil + 'articles.json', function(data) {
 
-    $('body').on('click', function (e) {
-      $('[data-original-title]').each(function () {
-        if (!$(this).is(e.target) &&
-            $(this).has(e.target).length === 0 &&
-            $('.popover').has(e.target).length === 0) {
-          $(this).popover('hide');
-        }
+        var perpage = 20;
+        var tot = parseInt(Math.ceil(data.length * 1. / perpage));
+
+        for (var i = 0; i < tot; ++i)
+          articles.push(data.slice(i * perpage, (i+1) * perpage));
+
+        var $list = $('#article-list');
+
+        $('#pagination').twbsPagination({
+          totalPages: tot - 1,
+          onPageClick: function (event, page) {
+            loadpagei(page);
+          }
+        });
+
+        loadpagei(1);
+
       });
-    });
+
+      $('body').on('click', function (e) {
+        $('[data-original-title]').each(function () {
+          if (!$(this).is(e.target) &&
+              $(this).has(e.target).length === 0 &&
+              $('.popover').has(e.target).length === 0) {
+            $(this).popover('hide');
+          }
+        });
+      });
+
+    }
 
   }
 

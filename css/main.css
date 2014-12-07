@@ -1,5 +1,5 @@
 html, body {
-    font-size: 16px;
+    font-family: 'serif';
 }
 
 #article-list>div {
@@ -8,4 +8,8 @@ html, body {
 
 .popover{
     max-width: 80%;
+}
+
+.evil .list-group-item-text>p {
+    color: blue;
 }
