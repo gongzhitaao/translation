@@ -2,7 +2,7 @@ html, body {
     font-family: 'serif';
 }
 
-#article-list>div {
+:not(.evil) #article-list>div) {
     cursor: pointer
 }
 
