@@ -143,11 +143,13 @@ $(document).ready(function() {
           var $p = $('<div/>', {'class': 'list-group-item-text'})
                 .append($('<p/>').text('摘要 (Abstract): ' + item['abstract_' + param['by']]));
 
-          var $d = $('<div/>', {'class': 'list-group-item'})
+          var $d = $('<div/>', {
+            'class': 'list-group-item',
+            'id': item['doi'].replace(/\//g, '-')})
                 .append(
                   $('<table/>')
                     .append($('<tr/>').append(
-                      $('<td/>', {'style': 'padding-right: 20px'}).text(i),
+                      $('<td/>', {'style': 'padding-right: 20px; vertical-align: top;'}).text(i + 1),
                       $('<td/>').append($r, $t, $l, $p))));
 
           $list.append($d);
@@ -179,11 +181,13 @@ $(document).ready(function() {
                 .append($('<p/>').text(item['abstract']),
                         $('<p/>').text(item['abstract_' + param['by']]));
 
-          var $d = $('<div/>', {'class': 'list-group-item'})
+          var $d = $('<div/>', {
+            'class': 'list-group-item',
+            'id': item['doi'].replace(/\//g, '-')})
                 .append(
                   $('<table/>')
                     .append($('<tr/>').append(
-                      $('<td/>', {'style': 'padding-right: 20px'}).text(i),
+                      $('<td/>', {'style': 'padding-right: 20px; vertical-align: top;'}).text(i + 1),
                       $('<td/>').append($r, $t, $p))));
 
           $list.append($d);
@@ -211,14 +215,19 @@ $(document).ready(function() {
           var $p = $('<div/>', {'class': 'list-group-item-text'})
                 .append($('<p/>').html('<b>Abstract</b>: ' + item['abstract']));
 
-          var $d = $('<div/>', {'class': 'list-group-item'})
+          var $d = $('<div/>', {
+            'class': 'list-group-item',
+            'id': item['doi'].replace(/\//g, '-')})
                 .append(
                   $('<table/>')
                     .append($('<tr/>').append(
-                      $('<td/>', {'style': 'padding-right: 20px'}).text(i),
+                      $('<td/>', {'style': 'padding-right: 20px; vertical-align: top;'}).text(i + 1),
                       $('<td/>').append($r, $l, $p))));
           $list.append($d);
         });
+
+        if (window.location.hash)
+          $('body').scrollTo(window.location.hash);
 
       });
 
