@@ -78,7 +78,7 @@ function loadpagei(page)
     var $t = $('<h3/>', {'class': 'list-group-item-heading'})
           .text(item['title'])
           .append($('<a/>', {
-            'href': item['url'],
+            'href': 'http://dx.doi.org/' + item['doi'],
             'style': 'margin-left: 10px'})
                   .append($('<span/>', {'class': 'glyphicon glyphicon-link'})));
     var $r = $('<small/>').html(item['citation']);
@@ -116,7 +116,7 @@ $(document).ready(function() {
                 $('<h3/>')
                   .text(item['title'])
                   .append($('<a/>', {
-                    'href': item['url'],
+                    'href': 'http://dx.doi.org/' + item['doi'],
                     'style': 'margin-left: 10px'})
                           .append($('<span/>', {'class': 'glyphicon glyphicon-link'}))),
                 $('<h3/>')
