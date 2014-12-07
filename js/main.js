@@ -6,6 +6,34 @@ var Provider = [
   {'name': 'Google', 'abbr': 'gl'},
   {'name': 'Auburn', 'abbr': 'zh'}
 ];
+var Code = ['ms', 'gl', 'zh'];
+
+function UrlParam(url) {
+
+  "use strict";
+
+  var rNull = /^\s*$/,
+      rBool = /^(true|false)$/i;
+
+  function conv(val) {
+    if (rNull.test(val)) return null;
+    if (rBool.test(val)) return val.toLowerCase() === "true";
+    if (isFinite(val)) return parseFloat(val);
+    if (isFinite(Date.parse(val))) return new Date(val);
+    return val;
+  }
+
+  if (!url) return null;
+
+  return url.split("?")[1].split("&")
+    .reduce(function(acc, cur) {
+      var pair = cur.split("=");
+      acc[unescape(pair[0])] = pair.length > 1
+        ? conv(unescape(pair[1]))
+        : null;
+      return acc;
+    }, {});
+}
 
 function mkcontent(page, i) {
   var j;
@@ -73,36 +101,73 @@ function loadpagei(page)
 
 $(document).ready(function() {
 
-  $.getJSON('articles.json', function(data) {
+  var param = UrlParam(window.location.search);
 
-    var perpage = 20;
-    var tot = parseInt(Math.ceil(data.length * 1. / perpage));
+  if (param && Code.indexOf(param['by']) > -1) {
+    $.getJSON('articles.json', function(data) {
 
-    for (var i = 0; i < tot; ++i)
-      articles.push(data.slice(i * perpage, (i+1) * perpage));
+      articles = data.slice();
 
-    var $list = $('#article-list');
+      var $list = $('#article-list').html('');
+      $.each(articles, function(i, item) {
+        var $r = $('<small/>').html(item['citation']);
+        var $t = $('<div/>', {'class': 'list-group-item-heading'})
+              .append(
+                $('<h3/>')
+                  .text(item['title'])
+                  .append($('<a/>', {
+                    'href': item['url'],
+                    'style': 'margin-left: 10px'})
+                          .append($('<span/>', {'class': 'glyphicon glyphicon-link'}))),
+                $('<h3/>')
+                  .text(item['title_' + param['by']])
+              );
+        var $p = $('<div/>', {'class': 'list-group-item-text'})
+              .append($('<p/>').text(item['abstract']),
+                      $('<p/>').text(item['abstract_' + param['by']]));
 
-    $('#pagination').twbsPagination({
-      totalPages: tot - 1,
-      onPageClick: function (event, page) {
-        loadpagei(page);
-      }
+        var $d = $('<div/>', {'class': 'list-group-item'})
+              .append($r, $t, $p);
+        $list.append($d);
+      });
+
     });
 
-    loadpagei(1);
+  } else {
 
-  });
+    $.getJSON('articles.json', function(data) {
 
-  $('body').on('click', function (e) {
-    $('[data-original-title]').each(function () {
-      if (!$(this).is(e.target) &&
-          $(this).has(e.target).length === 0 &&
-          $('.popover').has(e.target).length === 0) {
-        $(this).popover('hide');
-      }
+      var perpage = 20;
+      var tot = parseInt(Math.ceil(data.length * 1. / perpage));
+
+      for (var i = 0; i < tot; ++i)
+        articles.push(data.slice(i * perpage, (i+1) * perpage));
+
+      var $list = $('#article-list');
+
+      $('#pagination').twbsPagination({
+        totalPages: tot - 1,
+        onPageClick: function (event, page) {
+          loadpagei(page);
+        }
+      });
+
+      loadpagei(1);
+
     });
-  });
+
+    $('body').on('click', function (e) {
+      $('[data-original-title]').each(function () {
+        if (!$(this).is(e.target) &&
+            $(this).has(e.target).length === 0 &&
+            $('.popover').has(e.target).length === 0) {
+          $(this).popover('hide');
+        }
+      });
+    });
+
+  }
+
 });
 
 })(jQuery);
